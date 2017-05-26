@@ -2,65 +2,69 @@ extern int yylineno;
 void yyerror(char *s, ...);
 
 typedef struct {
-    scalars **t_scalar;
-    size_t num_scalars;
-    types **t_type;
-    size_t num_types;
-    enums **t_enum;
-    size_t num_enums;
-    directives **t_directive;
-    size_t num_directives;
+    scalars *t_scalar;
+    types *t_type;
+    enums *t_enum;
+    directives *t_directive;
 } t_document;
 
 typedef struct {
     name *char;
     description *char;
+    next *t_scalar;
 } t_scalar;
 
 typedef struct {
     name *char;
     description *char;
-    fields **t_enum_field;
-    size_t num_fields;
+    fields *t_enum_field;
+    next *t_enum;
 } t_enum;
 
 typedef struct {
     kind t_typekind;
     name *char;
     description *char;
-    fields **t_field; // object,interface
-    size_t num_fields;
-    //interfaces **interface; // not supported
-    //size_t num_interfaces;
-    //possibleTypes **t_type; // for unions
-    //size_t num_possibleTypes;
-    enumValues **t_enum_value; // enum
-    size_t num_enumValues;
-    inputFields **t_input_value; // object
-    size_t num_inputFields;
-    ofType t_type; // list,nonnull
+    fields *t_field; // object,interface
+    //interfaces *interface; // not supported
+    //possibleTypes *t_type; // for unions
+    enumValues *t_enum_value; // enum
+    inputFields *t_input_value; // object
+    ofType *t_type; // list,nonnull
+    next *t_type;
 } t_type;
 
 typedef struct {
 	name *char;
 	description *char;
 	locations *t_directive_location;
-    size_t num_locations;
-	args **t_input_value;
-    size_t num_args;
+	args *t_input_value;
+    next *t_directive;
 } t_directive;
 
 typedef struct {
     description *char;
     name *char;
+    next *t_enum_field;
 } t_enum_field;
 
 typedef struct {
 	name *char;
 	description *char;
-	isDeprecated *bool;
+	isDeprecated bool;
 	deprecationReason *char;
+    next *t_enum_value;
 } t_enum_value;
+
+typedef struct {
+	name *char;
+	description *char;
+	args *t_input_value;
+	type *t_type;
+	isDeprecated bool;
+	deprecationReason *char;
+    next *t_field;
+} t_field;
 
 typedef enum {
     TYPEKIND_SCALAR,
@@ -76,9 +80,15 @@ typedef enum {
 typedef struct {
 	name *char;
 	description *char;
-    type t_type;
+    type *t_type;
 	defaultValue *char;
+    next *t_input_value;
 } t_input_value;
+
+typedef struct {
+    location e_directive_location;
+    next *t_directive_location;
+} t_directive_location;
 
 typedef enum {
     DIRLOC_QUERY,
@@ -99,5 +109,4 @@ typedef enum {
     DIRLOC_ENUM_VALUE,
     DIRLOC_INPUT_OBJECT,
     DIRLOC_INPUT_FIELD_DEFINITION
-} t_directive_location;
-
+} e_directive_location;

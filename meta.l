@@ -29,12 +29,9 @@
 ":" { return yytext[0]; }
 
 @[_A-Za-z][_0-9A-Za-z]* { yylval.str = strdup(yytext); return DIRNAME; }
-
 [_A-Za-z][_0-9A-Za-z]* { yylval.str = strdup(yytext); return NAME; }
 
 [ \t\n,]  { /* ignore whitespace, newlines and commas */ }
-
-. {  yyerror("Mystery character '%c'\n", *yytext); }
 
 "LOCATION_QUERY"                  { yylval.dirloc = DIRLOC_QUERY; return DIRLOC; }
 "LOCATION_MUTATION"               { yylval.dirloc = DIRLOC_MUTATION; return DIRLOC; }
@@ -54,5 +51,7 @@
 "LOCATION_ENUM_VALUE"             { yylval.dirloc = DIRLOC_ENUM_VALUE; return DIRLOC; }
 "LOCATION_INPUT_OBJECT"           { yylval.dirloc = DIRLOC_INPUT_OBJECT; return DIRLOC; }
 "LOCATION_INPUT_FIELD_DEFINITION" { yylval.dirloc = DIRLOC_INPUT_FIELD_DEFINITION; return DIRLOC; }
+
+. {  yyerror("Mystery character '%c'\n", *yytext); }
 
 %%

@@ -16,8 +16,7 @@ int yylex();
 
 %token SCALAR TYPE DIRECTIVE ENUM ON
 %token <str> COMMENT
-%token <str> DESC
-%token <str> DEFAULT_VALUE
+%token <str> STR
 %token <str> DIRNAME
 %token <dirloc> DIRLOC
 
@@ -34,23 +33,29 @@ document:
     | document dir    { $$ = adddirective($1, $2); }
     ;
 
-scalar: SCALAR NAME { $$ = newscalar($2, ""); }
-      | COMMENT SCALAR NAME { $$ = newscalar($2, $1); }
+scalar:         SCALAR NAME { $$ = newscalar("", $2); }
+      | COMMENT SCALAR NAME { $$ = newscalar($1, $2); }
 
-enum: ENUM NAME '{' enumValues '}' { $$ = newenum($2, $4, ""); }
-    | COMMENT ENUM NAME '{' enumValues '}' { $$ = newenum($2, $4, $1); }
+enum:         ENUM NAME '{' enumValues '}' { $$ = newenum($2, $4, ""); }
+    | COMMENT ENUM NAME '{' enumValues '}' { $$ = newenum($1, $3, $5); }
 
-type: TYPE NAME '{' args '}' { $$ = newtype($2, $4, ""); }
-    | COMMENT TYPE NAME '{' args '}' { $$ = newtype($2, $4, $1); }
+type:         TYPE NAME '{' fields '}' { $$ = newtype("", $2, $4); }
+    | COMMENT TYPE NAME '{' fields '}' { $$ = newtype($1, $3, $5); }
 
-dir: DIRECTIVE DIRNAME '(' args ')' ON dirlocs { $$ = newdir($2, $3, $4, $6, ""); }
-   | COMMENT DIRECTIVE DIRNAME '(' args ')' ON dirlocs { $$ = newdir($3, $4, $5, $7, $1); }
+dir:         DIRECTIVE DIRNAME '(' fields ')' ON dirlocs { $$ = newdir("", $2, $4, $7); }
+   | COMMENT DIRECTIVE DIRNAME '(' fields ')' ON dirlocs { $$ = newdir($1, $3, $5, $8); }
 
-dirlocs: DIRLOC /* directive locations */
-       | dirlocs '|' DIRLOC { $$ = $3; }
-
-args: ;
+fields:
+    | fields         NAME              ':' type { $$ = newfield($1, "", $2, NULL, $4); }
+    | fields COMMENT NAME              ':' type { $$ = newfield($1, $2, $3, NULL, $5); }
+    | fields         NAME '(' args ')' ':' type { $$ = newfield($1, "", $2, $4, $7); }
+    | fields COMMENT NAME '(' args ')' ':' type { $$ = newfield($1, $2, $3, $5, $8); }
+    ;
 
 enumValues:
     | enumValues NAME { $$ = newenumvalue($2, ""); }
     | enumValues COMMENT NAME { $$ = newenumvalue($2, $3); }
+
+
+dirlocs: DIRLOC /* directive locations */
+       | dirlocs '|' DIRLOC { $$ = $3; }
