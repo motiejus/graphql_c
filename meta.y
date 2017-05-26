@@ -8,11 +8,11 @@ int yylex();
 %parse-param { *t_type types; }
 
 %union {
-    char *str;
-    t_document *document;
-    t_scalar *scalar;
-    t_type *type;
-    t_enum *enum;
+    char* str;
+    t_document* document;
+    t_scalar* scalar;
+    t_type* type;
+    t_enum* enum;
     t_directive_location dirloc;
 }
 
