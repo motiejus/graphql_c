@@ -10,10 +10,14 @@ int yylex();
 }
 
 %token SCALAR TYPE DIRECTIVE ENUM ON
+%token <str> COMMENT
+%token <str> DESC
+%token <str> DEFAULT_VALUE
+%token <str> DIRECTIVE_NAME
 
-%type <str> comment
-%type <str> desc
-%type <str> default_value
+%type <scalar> scalar
+%type <type> type
+%type <enum> enum
 
 %%
 document:
@@ -24,20 +28,21 @@ definition:
     | scalar
     | type
     | enum
+    ;
 
 scalar:
     SCALAR NAME { $$ = newscalar($2); }
 
-type: TYPE NAME typedefn { $$ = newtype($2, $3); }
+type: TYPE NAME '{' typeFields '}' { $$ = newtype($2, $4, ""); }
+    | COMMENT TYPE NAME '{' typeFields '}' { $$ = newtype($2, $4, $1); }
 
 /* directive */
 
-enum: ENUM NAME enumdefn { $$ = newenum($2, $3); }
+enum: ENUM NAME '{' enumValues '}' { $$ = newenum($2, $4, ""); }
+    | COMMENT ENUM NAME '{' enumValues '}' { $$ = newenum($2, $4, $1); }
 
-typedefn: ;
-enumdefn:
-    '{' enumValues'}' ;
+typeFields: ;
 
 enumValues:
-     | name name
-     | comment name name
+    | enumValues NAME { $$ = newenumvalue($2, ""); }
+    | enumValues COMMENT NAME { $$ = newenumvalue($2, $3); }

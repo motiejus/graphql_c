@@ -6,9 +6,9 @@
 
 %%
 
-^[ \t]*"#"[ \t]*([^ \t].*) { yylval.comment = yytext; return COMMENT; }
+^[ \t]*"#"[ \t]*([^ \t].*) { yylval.str = strdup(yytext); return COMMENT; }
 
-\"(\\.|[^"])*\"  { yylval.str = yytext; return STR; }
+\"(\\.|[^"])*\"  { yylval.str = strdup(yytext); return STR; }
 
 "scalar"    { return SCALAR; }
 "type"      { return TYPE; }
@@ -28,7 +28,9 @@
 "@" |
 ":" { return yytext[0]; }
 
-[_A-Za-z][_0-9A-Za-z]* { yylval.name = yytext; return NAME; }
+@([_A-Za-z][_0-9A-Za-z]*) { yylval.str = strdup(yytext); return DIRECTIVE_NAME; }
+
+[_A-Za-z][_0-9A-Za-z]* { yylval.str = strdup(yytext); return NAME; }
 
 [ \t\n,]  { /* ignore whitespace, newlines and commas */ }
 
