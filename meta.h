@@ -4,13 +4,13 @@ void yyerror(char *s, ...);
 #define N 64
 
 typedef struct {
-    scalars t_scalar[N];
+    scalars **t_scalar;
     size_t num_scalars;
-    types t_type[N];
+    types **t_type;
     size_t num_types;
-    enums t_enum[N];
+    enums **t_enum;
     size_t num_enums;
-    directives t_directive[N];
+    directives **t_directive;
     size_t num_directives;
 } t_document;
 
@@ -22,9 +22,9 @@ typedef struct {
 typedef struct {
 	name *char;
 	description *char;
-	locations t_directive_location[N];
+	locations *t_directive_location;
     size_t num_locations;
-	args t_input_value[N];
+	args **t_input_value;
     size_t num_args;
 } t_directive;
 
@@ -32,15 +32,15 @@ typedef struct {
     kind t_typekind;
     name *char;
     description *char;
-    fields t_field[N]; // object,interface
+    fields **t_field; // object,interface
     size_t num_fields;
-    //interfaces interface[N]; // not supported
+    //interfaces **interface; // not supported
     //size_t num_interfaces;
-    //possibleTypes t_type[N]; // for unions
+    //possibleTypes **t_type; // for unions
     //size_t num_possibleTypes;
-    enumValues t_enum_value[N]; // enum
+    enumValues **t_enum_value; // enum
     size_t num_enumValues;
-    inputFields t_input_value[N]; // object
+    inputFields **t_input_value; // object
     size_t num_inputFields;
     ofType t_type; // list,nonnull
 } t_type;
@@ -48,7 +48,7 @@ typedef struct {
 typedef struct {
     name *char;
     description *char;
-    fields t_enum_field[N];
+    fields **t_enum_field;
     size_t num_fields;
 } t_enum;
 

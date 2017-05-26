@@ -7,6 +7,7 @@ int yylex();
 
 %union {
     char *str;
+    t_document *document;
 }
 
 %token SCALAR TYPE DIRECTIVE ENUM ON
@@ -15,6 +16,7 @@ int yylex();
 %token <str> DEFAULT_VALUE
 %token <str> DIRECTIVE_NAME
 
+%type <document> document
 %type <scalar> scalar
 %type <type> type
 %type <enum> enum
