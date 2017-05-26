@@ -2,68 +2,68 @@ extern int yylineno;
 void yyerror(char *s, ...);
 
 typedef struct {
-    scalars *t_scalar;
-    types *t_type;
-    enums *t_enum;
-    directives *t_directive;
+    t_scalar *scalars;
+    t_type *types;
+    t_enum *enums;
+    t_directive *directives;
 } t_document;
 
 typedef struct {
-    name *char;
-    description *char;
-    next *t_scalar;
+    char *name;
+    char *description;
+    t_scalar *next;
 } t_scalar;
 
 typedef struct {
-    name *char;
-    description *char;
-    fields *t_enum_field;
-    next *t_enum;
+    char *name;
+    char *description;
+    t_enum_field *fields;
+    t_enum *next;
 } t_enum;
 
 typedef struct {
-    kind t_typekind;
-    name *char;
-    description *char;
-    fields *t_field; // object,interface
+    t_typekind kind;
+    char *name;
+    char *description;
+    t_field *fields; // object,interface
     //interfaces *interface; // not supported
-    //possibleTypes *t_type; // for unions
-    enumValues *t_enum_value; // enum
-    inputFields *t_input_value; // object
-    ofType *t_type; // list,nonnull
-    next *t_type;
+    //possibleTypes **t_type; // for unions
+    t_enum_value *enumValues; // enum
+    t_input_value *inputFields; // object
+    t_type *ofType; // list,nonnull
+    t_type *next;
 } t_type;
 
 typedef struct {
-	name *char;
-	description *char;
-	locations *t_directive_location;
-	args *t_input_value;
-    next *t_directive;
+	char *name;
+	char *description;
+	t_directive_location *locations;
+	t_input_value *args;
+    t_directive *next;
 } t_directive;
 
 typedef struct {
-    description *char;
-    name *char;
-    next *t_enum_field;
+    char *description;
+    char *name;
+    t_enum_field *next;
 } t_enum_field;
 
 typedef struct {
-	name *char;
-	description *char;
-	isDeprecated bool;
-	deprecationReason *char;
-    next *t_enum_value;
+	char *name;
+	char *description;
+	boo *isDeprecated;
+	char *deprecationReason;
+    t_enum_value *next;
 } t_enum_value;
 
 typedef struct {
-	name *char;
-	description *char;
-	args *t_input_value;
-	type *t_type;
-	isDeprecated bool;
-	deprecationReason *char;
-    next *t_field;
+	char *name;
+	char *description;
+	t_input_value *args;
+	t_type *type;
+	bool isDeprecated;
+	char *deprecationReason;
+    t_field *next;
 } t_field;
 
 typedef enum {
@@ -78,16 +78,16 @@ typedef enum {
 } t_typekind;
 
 typedef struct {
-	name *char;
-	description *char;
-    type *t_type;
-	defaultValue *char;
-    next *t_input_value;
+	char *name;
+	char *description;
+    t_type *type;
+	char *defaultValue;
+    t_input_value *next;
 } t_input_value;
 
 typedef struct {
-    location e_directive_location;
-    next *t_directive_location;
+    e_directive_locatio *location;
+    t_directive_location *next;
 } t_directive_location;
 
 typedef enum {
