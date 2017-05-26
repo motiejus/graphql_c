@@ -18,8 +18,8 @@ int yylex();
 %token <str> COMMENT
 %token <str> DESC
 %token <str> DEFAULT_VALUE
-%token <str> DIRECTIVE_NAME
-%token <dirloc> DIRECTIVE_LOCATION
+%token <str> DIRNAME
+%token <dirloc> DIRLOC
 
 %type <document> document
 %type <scalar> scalar
@@ -29,25 +29,25 @@ int yylex();
 %%
 document:
     | document scalar { $$ = addscalar($1, $2); }
-    | document type   { $$ = addtype($1, $2); }
     | document enum   { $$ = addenum($1, $2); }
+    | document type   { $$ = addtype($1, $2); }
+    | document dir    { $$ = adddirective($1, $2); }
     ;
 
 scalar: SCALAR NAME { $$ = newscalar($2, ""); }
       | COMMENT SCALAR NAME { $$ = newscalar($2, $1); }
 
-type: TYPE NAME '{' args '}' { $$ = newtype($2, $4, ""); }
-    | COMMENT TYPE NAME '{' args '}' { $$ = newtype($2, $4, $1); }
-
-directive:
-         DIRECTIVE DIRECTIVE_NAME '(' args ')' ON directive_locations
-         COMMENT DIRECTIVE DIRECTIVE_NAME '(' args ')' ON directive_locations
-
 enum: ENUM NAME '{' enumValues '}' { $$ = newenum($2, $4, ""); }
     | COMMENT ENUM NAME '{' enumValues '}' { $$ = newenum($2, $4, $1); }
 
-directive_locations:
-    | directive_locations DIRECTIVE_LOCATION { ... }
+type: TYPE NAME '{' args '}' { $$ = newtype($2, $4, ""); }
+    | COMMENT TYPE NAME '{' args '}' { $$ = newtype($2, $4, $1); }
+
+dir: DIRECTIVE DIRNAME '(' args ')' ON dirlocs { $$ = newdir($2, $3, $4, $6, ""); }
+   | COMMENT DIRECTIVE DIRNAME '(' args ')' ON dirlocs { $$ = newdir($3, $4, $5, $7, $1); }
+
+dirlocs: DIRLOC /* directive locations */
+       | dirlocs '|' DIRLOC { $$ = $3; }
 
 args: ;
 
