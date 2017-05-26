@@ -4,11 +4,17 @@
 #include "meta.tab.h"
 %}
 
+EXP ([Ee][-+]?[0-9]+)
 %%
 
 ^[ \t]*"#"[ \t]*([^ \t].*) { yylval.str = strdup(yytext); return COMMENT; }
 
-\"(\\.|[^"])*\"  { yylval.str = strdup(yytext); return STR; }
+\"(\\.|[^"])*\"       |
+"null"                |
+"true"                |
+"false"               |
+[0-9]+"."[0-9]*{EXP}? |
+"."?[0-9]+{EXP}?      { yylval.str = strdup(yytext); return STR; }
 
 "scalar"    { return SCALAR; }
 "type"      { return TYPE; }

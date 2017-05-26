@@ -5,13 +5,7 @@
 int yylex();
 %}
 
-%code {
-/* global `types` is used for:
- *   access types in field definitions.
- *   add types when scalars are defined.
- */
-t_type types;
-}
+%parse-param{t_document* doc}
 
 %union {
     char* str;
@@ -38,20 +32,20 @@ t_type types;
 document:
     | document scalar    { $$ = addscalar($1, $2); }
     | document enum      { $$ = addenum($1, $2); }
-    | document type      { $$ = addtype($1, $2); }
+    | document type      { /* types are added to the doc via global variable below */ }
     | document directive { $$ = adddirective($1, $2); }
     ;
 
-scalar:         SCALAR NAME { $$ = newscalar("", $2); }
-      | COMMENT SCALAR NAME { $$ = newscalar($1, $2); }
+scalar:         SCALAR NAME { $$ = newscalar(doc, "", $2); }
+      | COMMENT SCALAR NAME { $$ = newscalar(doc, $1, $2); }
       ;
 
-enum:         ENUM NAME '{' enumValues '}' { $$ = newenum($2, $4, ""); }
-    | COMMENT ENUM NAME '{' enumValues '}' { $$ = newenum($1, $3, $5); }
+enum:         ENUM NAME '{' enumValues '}' { $$ = newenum(doc, $2, $4, ""); }
+    | COMMENT ENUM NAME '{' enumValues '}' { $$ = newenum(doc, $1, $3, $5); }
     ;
 
-type:         TYPE NAME '{' fields '}' { $$ = newtype("", $2, $4); }
-    | COMMENT TYPE NAME '{' fields '}' { $$ = newtype($1, $3, $5); }
+type:         TYPE NAME '{' fields '}' { $$ = newtype(doc, "", $2, $4); }
+    | COMMENT TYPE NAME '{' fields '}' { $$ = newtype(doc, $1, $3, $5); }
     ;
 
 directive:         DIRECTIVE DIRNAME '(' fields ')' ON dirlocs { $$ = newdir("", $2, $4, $7); }
@@ -59,15 +53,15 @@ directive:         DIRECTIVE DIRNAME '(' fields ')' ON dirlocs { $$ = newdir("",
          ;
 
 fields:
-    | fields         NAME              ':' type { $$ = newfield($1, "", $2, NULL, $4); }
-    | fields COMMENT NAME              ':' type { $$ = newfield($1, $2, $3, NULL, $5); }
-    | fields         NAME '(' args ')' ':' type { $$ = newfield($1, "", $2, $4, $7); }
-    | fields COMMENT NAME '(' args ')' ':' type { $$ = newfield($1, $2, $3, $5, $8); }
+    | fields         NAME              ':' fieldType { $$ = newfield($1, "", $2, NULL, $4); }
+    | fields COMMENT NAME              ':' fieldType { $$ = newfield($1, $2, $3, NULL, $5); }
+    | fields         NAME '(' args ')' ':' fieldType { $$ = newfield($1, "", $2, $4, $7); }
+    | fields COMMENT NAME '(' args ')' ':' fieldType { $$ = newfield($1, $2, $3, $5, $8); }
     ;
 
-type: NAME         { $$ = gettype($1); }
-    | '[' type ']' { $$ = newlisttype($2); }
-    | type '!'     { $$ = newnonnulltype($1); }
+fieldType: NAME              { $$ = gettype(doc, $1); }
+         | '[' fieldType ']' { $$ = list($2); }
+         | fieldType '!'     { $$ = nonnull($1); }
 
 enumValues:
     | enumValues NAME         { $$ = newenumvalue($1, "", $2); }
