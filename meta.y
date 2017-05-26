@@ -5,7 +5,13 @@
 int yylex();
 %}
 
-%parse-param { *t_type types; }
+%code {
+/* global `types` is used for:
+ *   access types in field definitions.
+ *   add types when scalars are defined.
+ */
+t_type types;
+}
 
 %union {
     char* str;
@@ -28,6 +34,7 @@ int yylex();
 %type <enum> enum
 
 %%
+
 document:
     | document scalar    { $$ = addscalar($1, $2); }
     | document enum      { $$ = addenum($1, $2); }
